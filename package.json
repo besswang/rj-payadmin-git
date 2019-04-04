@@ -1,0 +1,73 @@
+{
+  "name": "rj-payadmin",
+  "version": "1.0.0",
+  "description": "My first-rate Nuxt.js project",
+  "author": "wang",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.4.1",
+    "cross-env": "^5.2.0",
+    "element-ui": "^2.4.11",
+    "nuxt": "^2.4.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/proxy": "^1.3.3",
+    "@vue/test-utils": "^1.0.0-beta.27",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^24.1.0",
+    "eslint": "^5.16.0",
+    "jest": "^24.1.0",
+    "nodemon": "^1.18.9",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "vue-jest": "^3.0.3"
+  },
+  "eslintConfig": {
+    "extends": "rj-payadmin",
+    "env": {
+      "es6": true
+    },
+    "parser": "babel-eslint",
+    "rules": {
+      "jsx-a11y/anchor-is-valid": 0,
+      "no-multi-spaces": 1,
+      "jsx-quotes": 1,
+      "template-curly-spacing": [
+        1,
+        "always"
+      ],
+      "quotes": [
+        1,
+        "single",
+        {
+          "avoidEscape": true
+        }
+      ],
+      "no-use-before-define": 1,
+      "semi": [
+        1,
+        "never",
+        {
+          "beforeStatementContinuationChars": "always"
+        }
+      ],
+      "prefer-const": 1,
+      "no-undef": 1,
+      "class-methods-use-this": 0,
+      "no-empty": 1,
+      "no-case-declarations": 1,
+      "no-return-assign": 1,
+      "no-param-reassign": 1,
+      "no-shadow": 1,
+      "camelcase": 1,
+      "no-unused-vars": 1
+    }
+  }
+}
