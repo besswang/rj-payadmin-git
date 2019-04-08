@@ -1,7 +1,23 @@
 <template>
   <section>
     <div>
-      <el-button type="primary" class="mb15">添加渠道</el-button>
+      <el-form :inline="true">
+        <el-form-item>
+          <el-input v-model="name" placeholder="请输入渠道名称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="status" placeholder="状态" clearable>
+            <el-option label="启用" :value="true"></el-option>
+            <el-option label="禁用" :value="false"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="search">搜索</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="mb15" @click="add">添加渠道</el-button>
+        </el-form-item>
+      </el-form>
       <el-table
         :data="list"
         border
@@ -49,17 +65,29 @@
         @current-change="handleCurrentChange"
         :current-page="currentPage"
         :page-sizes="[10, 20, 30, 40]"
-        :page-size="10"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100">
+        :total="total">
       </el-pagination>
-      <div>{{todos}}</div>
+      <!-- 添加弹窗-start -->
+      <el-dialog title="添加渠道" :visible.sync="dialogVisible" style="max-width:50rem;margin:0 auto">
+        <el-form>
+          <el-form-item label="渠道名称">
+            <el-input v-model="addName" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addSave">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 添加弹窗-end -->
     </div>
   </section>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 import Logo from '~/components/Logo.vue'
 
 export default {
@@ -68,57 +96,99 @@ export default {
   },
   data () {
     return {
-      currentPage:1,
-      list: [
-        {
-          id: 1,
-          gmt: 1553754190000,
-          upt: 1553754189000,
-          version: 1,
-          name: "渠道1",
-          type: "WX",
-          status: true,
-          sort: 0
-        }
-      ]
+      addName: '',
+      name: '',
+      status: null,
+      currentPage: 1,
+      total: 0,
+      pageSize: 10,
+      loading: false
+      // list: [
+      //   {
+      //     id: 1,
+      //     gmt: 1553754190000,
+      //     upt: 1553754189000,
+      //     version: 1,
+      //     name: "渠道1",
+      //     type: "WX",
+      //     status: true,
+      //     sort: 0
+      //   }
+      // ]
     }
   },
-  // async fetch ({ store, params }) {
-  //   let data = await $axios.post('/admin/query/list')
-  //   console.log( data )
-  //   // store.commit('SET_LIST', data.list)
-  // },
   computed: {
-    todos () {
-      return this.$store.state.todos.list
-    }
+    // ...mapState({
+    //   counter: 'counter'
+    // }),
+    ...mapState('ditch',['list', 'dialogVisible'])
   },
   mounted () {
-    this.$axios.post('/admin/query/list')
-      .then(res => {
-        console.log()
-        const list = res.data.list
-        this.$store.commit('todos/add', list)
-      })
-      .catch(e => {
-        console.log(e)
-      })
+    this.listFn()
   },
   methods: {
+    ...mapMutations('ditch',{
+      mapList: 'list',
+      mapVisible: 'changeVisible'
+    }),
+    listFn (val) {
+      this.$axios.post(this.jk.queryList,val)
+        .then(res => {
+          const l = res.data
+          this.mapList(l)
+          this.currentPage = l.pageNum
+          this.pageSize = l.pageSize
+          this.total = l.total
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
+    add () {
+      this.mapVisible()
+    },
+    addSave () {
+      this.$axios.post(this.jk.ditchAdd, {name: this.addName})
+        .then(res => {
+          if(res.success){
+            this.$message({
+              message: '添加成功',
+              type: 'success'
+            })
+          }else{
+            this.$message.error(res.msg)
+          }
+          this.mapVisible()
+          this.listFn()
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
+    search () {
+      let trans = {
+        name: this.name,
+        status: this.status
+      }
+      this.listFn(trans)
+    },
     handleSizeChange(val) {
+      this.pageSize = val
+      let trans = {
+        name: this.name,
+        status: this.status,
+        pageSize: val
+      }
+      this.listFn(trans)
       console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
+      this.currentPage = val
+      this.listFn()
       console.log(`当前页: ${val}`);
     },
     handleEdit(index, row) {
       console.log(index, row);
-    },
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
     }
   }
 }

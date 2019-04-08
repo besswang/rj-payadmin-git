@@ -33,7 +33,7 @@ export default {
   /*
   ** Plugins to load before mounting the App
   */
-  plugins: ['@/plugins/element-ui', '@/plugins/filters.js', '@/plugins/axios.js'],
+  plugins: ['@/plugins/element-ui', '@/plugins/filters.js', '@/plugins/axios.js', '@/plugins/jk.js'],
 
   /*
   ** Nuxt.js modules
