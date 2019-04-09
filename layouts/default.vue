@@ -8,14 +8,14 @@
         <el-aside width="200px">
           <el-menu
               router
-              default-active="/"
+              :default-active="navselected"
+              :active="navselected"
               class="el-menu-vertical-demo"
-              @open="handleOpen"
-              @close="handleClose">
-              <el-menu-item index="/setting">
+              @select="menuFn">
+              <el-menu-item index="/">
                 <span slot="title">全局配置</span>
               </el-menu-item>
-              <el-menu-item index="/">
+              <el-menu-item index="/ditch">
                 <span slot="title">渠道列表</span>
               </el-menu-item>
               <el-menu-item index="/topUpType">
@@ -49,13 +49,34 @@ export default {
   components: {
     Logo
   },
-  methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
+  data () {
+    return {
+      navselected: '/'
     }
+  },
+  methods: {
+    menuFn(path) {
+      this.navselected = path
+      this.$router.push({
+          path,
+          query: {
+          t: +new Date() //保证每次点击路由的query项都是不一样的，确保会重新刷新view
+          }
+      })
+    },
+    getNavType(){
+        console.log(this.$store.state.page)
+        console.log(this.navselected)
+        this.navselected = this.$store.state.page
+    }
+  },
+  watch: {
+      // 监测store.state
+      navselected : function (val, oldVal) {
+        // console.log(val)
+        // console.log(oldVal)
+      },
+      '$store.state.page': 'getNavType'
   }
 }
 </script>

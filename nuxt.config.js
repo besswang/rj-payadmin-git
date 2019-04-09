@@ -43,7 +43,7 @@ export default {
   ],
   axios: {
       proxy: true, // 表示开启代理
-      prefix: '/api/channel', // 表示给请求url加个前缀 /api
+      prefix: '/api', // 表示给请求url加个前缀 /api
       credentials: true // 表示跨域请求时是否需要使用凭证
   },
   proxy: {

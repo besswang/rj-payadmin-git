@@ -1,9 +1,13 @@
 export const state = () => ({
-  counter: 666
+  counter: 666,
+  page: '/'
 })
 
 export const mutations = {
-  increment(state) {
+  increment (state) {
     state.counter++
+  },
+  changePage (state, data) {
+    state.page = data
   }
 }
