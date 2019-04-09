@@ -39,6 +39,7 @@
         </el-main>
       </el-container>
     </el-container>
+    <p>{{$store.state.page}}</p>
   </div>
 </template>
 
@@ -51,7 +52,7 @@ export default {
   },
   data () {
     return {
-      navselected: '/'
+      navselected: this.$store.state.page
     }
   },
   methods: {
@@ -73,10 +74,13 @@ export default {
   watch: {
       // 监测store.state
       navselected : function (val, oldVal) {
-        // console.log(val)
-        // console.log(oldVal)
-      },
-      '$store.state.page': 'getNavType'
+        console.log(val)
+        console.log(oldVal)
+        console.log(this.$store.state.page)
+        this.navselected = this.$store.state.page
+
+      }
+      // '$store.state.page': 'getNavType'
   }
 }
 </script>
