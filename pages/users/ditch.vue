@@ -163,7 +163,9 @@ export default {
             const l = res.data
             this.mapList(l)
             this.total = l.total
-            this.mapLoading()
+            setTimeout(() => {
+              this.mapLoading()
+            }, 500)
           }
         })
         .catch(e => {
