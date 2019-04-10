@@ -5,9 +5,10 @@ export default {
   generate : {
     subFolders: false
   },
-  // router: {
-  //   base: '../'
-  // },
+  router: {
+    // base: '../'
+    // mode: 'hash'
+  },
 
   /*
   ** Headers of the page
@@ -57,7 +58,7 @@ export default {
       target: 'http://47.94.142.215:8082', // 目标接口域名
       changeOrigin: true, // 表示是否跨域
       pathRewrite: {
-        '^/api': '/', // 把 /api 替换成 /
+        '^/api': '', // 把 /api 替换成 /
       }
     }
   },

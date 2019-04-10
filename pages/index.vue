@@ -28,18 +28,11 @@
               <el-menu-item index="/users/topUpMethod">
                 <span slot="title">支付方式列表</span>
               </el-menu-item>
-              <!-- <el-submenu index="2">
-                <template slot="title">渠道管理</template>
-                <el-menu-item index="2-1">渠道列表</el-menu-item>
-                <el-menu-item index="2-1">充值类型列表</el-menu-item>
-              </el-submenu> -->
             </el-menu>
             <div class="menu-patch"></div>
         </el-aside>
         <el-main>
-          <!-- <nuxt /> -->
           <NuxtChild :key="key"/>
-          <!-- <nuxt-child /> -->
         </el-main>
       </el-container>
     </el-container>
@@ -47,13 +40,8 @@
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
 
 export default {
-  // middleware: 'authenticated',
-  components: {
-    Logo
-  },
   data () {
     return {
       navselected: this.$store.state.page
@@ -72,7 +60,6 @@ export default {
         this.navselected = this.$store.state.page
     },
     selectItems(path){
-      console.log(path)
       this.$store.commit('changePage',path);
       //按钮选中之后设置当前的index为store里的值。
       this.$router.push({
