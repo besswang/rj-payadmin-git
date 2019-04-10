@@ -28,12 +28,12 @@ export default {
         password: ''
       },
       ruleLogin: {
-        userName: [
-          { validator: this.$global.valiTel, trigger: 'blur' }
-        ],
-        password: [
-          { validator: this.$global.valiPass, trigger: 'blur' }
-        ]
+        // userName: [
+        //   { validator: this.$global.valiTel, trigger: 'blur' }
+        // ],
+        // password: [
+        //   { validator: this.$global.valiPass, trigger: 'blur' }
+        // ]
       }
     }
   },
