@@ -1,148 +1,152 @@
 <template>
-  <section>
-    <div>
-      <el-tabs type="border-card" v-model="currentTab" @tab-click="tabClick">
-        <el-tab-pane v-for="list in tabs"
-          :key="list.name"
-          :label="list.title"
-          :name="list.name">
-          <el-row class="info">
-            <el-col :span="12">创建时间：{{ tabdata.gmt | formatDate('yyyy-MM-dd') }}</el-col>
-            <el-col :span="12">更新时间：{{ tabdata.upt | formatDate('yyyy-MM-dd') }}</el-col>
-            <el-col :span="12">{{ list.title }}：{{ tabdata.configValue }}</el-col>
-            <el-col :span="12">
-              <el-button type="primary" @click="edit">修改</el-button>
-            </el-col>
-          </el-row>
-        </el-tab-pane>
-      </el-tabs>
-          <!-- 添加弹窗-start -->
-      <el-dialog title="修改" :visible.sync="dialogVisible" style="max-width:50rem;margin:0 auto" :show-close="false">
-        <el-form label-width="140px">
-          <el-form-item :label="dialogLabel">
-            <el-input v-if="currentTab==='CODE_TYPE'" v-model="num" autocomplete="off"></el-input>
-            <el-input v-else v-model="num" autocomplete="off" type="number"></el-input>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="mapcancel">取 消</el-button>
-          <el-button type="primary" @click="save" :loading="btnLoading">确 定</el-button>
-        </div>
-      </el-dialog>
-      <!-- 添加弹窗-end -->
-    </div>
-  </section>
+  <div style="height:100%;">
+    <!-- 框架英文：https://nuxtjs.org/guide/installation
+    框架中文：https://nuxtjs.org/guide/installation -->
+    <el-container style="height:100%;">
+      <el-header class="header-con">
+        <h1 class="header-title">xxx后台</h1>
+      </el-header>
+      <el-container style="height:100%;">
+        <el-aside width="200px">
+          <el-menu
+              router
+              :default-active="navselected"
+              @select="selectItems"
+              class="el-menu-vertical-demo">
+              <el-menu-item index="/users/">
+                <span slot="title">全局配置</span>
+              </el-menu-item>
+              <el-menu-item index="/users/ditch">
+                <span slot="title">渠道列表</span>
+              </el-menu-item>
+              <el-menu-item index="/users/topUpType">
+                <span slot="title">充值类型列表</span>
+              </el-menu-item>
+              <el-menu-item index="/users/topUpMoney">
+                <span slot="title">充值金额列表</span>
+              </el-menu-item>
+              <el-menu-item index="/users/topUpMethod">
+                <span slot="title">支付方式列表</span>
+              </el-menu-item>
+              <!-- <el-submenu index="2">
+                <template slot="title">渠道管理</template>
+                <el-menu-item index="2-1">渠道列表</el-menu-item>
+                <el-menu-item index="2-1">充值类型列表</el-menu-item>
+              </el-submenu> -->
+            </el-menu>
+            <div class="menu-patch"></div>
+        </el-aside>
+        <el-main>
+          <!-- <nuxt /> -->
+          <NuxtChild :key="key"/>
+          <!-- <nuxt-child /> -->
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
 import Logo from '~/components/Logo.vue'
 
 export default {
+  // middleware: 'authenticated',
   components: {
     Logo
   },
   data () {
     return {
-      dialogLabel: '',
-      num: null,
-      currentTab: 'SERVER_RATE',
-      tabdata: {},
-      tabs: [
-        {
-          title:'服务费率',
-          name: 'SERVER_RATE'
-        },{
-          title:'最低充值金额',
-          name: 'MINI_MONEY'
-        },{
-          title:'最高充值金额',
-          name: 'MAX_MONEY'
-        },{
-          title:'扫码',
-          name: 'CODE_TYPE'
-        }
-      ],
-      id: null,
-      addName: ''
+      navselected: this.$store.state.page
     }
+  },
+  created () {
+    this.$router.push('/users'); // 页面加载时跳转
   },
   computed: {
-    ...mapState('ditch',['list', 'dialogVisible','loading','btnLoading'])
-  },
-  mounted () {
-    this.tabClick()
+      key() {
+          return this.$route.name !== undefined? this.$route.name +new Date(): this.$route +new Date()
+      }
   },
   methods: {
-    ...mapMutations('ditch',{
-      mapVisible: 'changeVisible',
-      mapLoading: 'changeLoading',
-      mapBtnLoading: 'changeBtnLoading',
-      mapcancel: 'cancel'
-    }),
-    tabClick () {
-      this.mapcancel()
-      this.$axios.post(this.jk.setting,{configType: this.currentTab})
-        .then(res => {
-          if(res.success){
-            // if(this.currentTab === 'CODE_TYPE'){
-            //   if(res.data.configValue === '0'){
-            //     res.data.configValue= '官方'
-            //   } else {
-            //     res.data.configValue = 'p++'
-            //   }
-            // }
-            this.tabdata = res.data
+    getNavType(){
+        this.navselected = this.$store.state.page
+    },
+    selectItems(path){
+      console.log(path)
+      this.$store.commit('changePage',path);
+      //按钮选中之后设置当前的index为store里的值。
+      this.$router.push({
+          path,
+          query: {
+          t: +new Date() //保证每次点击路由的query项都是不一样的，确保会重新刷新view
           }
-        })
-        .catch(e => {
-          console.log(e)
-        })
-    },
-    edit() {
-      this.dialogLabel = this.tabdata.title
-      this.num = this.tabdata.configValue
-      this.mapVisible()
-    },
-    save () {
-      if(this.num !== ''){
-        this.mapBtnLoading()
-          this.$axios.post(this.jk.settingEdit,{id:this.tabdata.id,value:this.num})
-            .then(res => {
-              if(res.success){
-                this.$message({
-                  message: '修改成功',
-                  type: 'success'
-                })
-                this.mapVisible()
-                this.mapBtnLoading()
-                this.tabClick()
-              }else{
-                this.$message.error(res.msg)
-                this.addName = ''
-              }
-            })
-            .catch(e => {
-              console.log(e)
-            })
-      } else {
-        this.$message({
-          message: '修改内容不能为空',
-          type: 'warning'
-        });
-      }
+      })
     }
+
+  },
+  watch: {
+      '$store.state.page': 'getNavType'
   }
 }
 </script>
-
-<style scoped>
-.info{
-  color:#5e6d82;
-  font-size:14px;
-  padding-top:20px
+<style>
+html {
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  word-spacing: 1px;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
 }
-.info .el-col-12{
-  padding-bottom:10px
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.button--green {
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid #3b8070;
+  color: #3b8070;
+  text-decoration: none;
+  padding: 10px 30px;
+}
+
+.button--green:hover {
+  color: #fff;
+  background-color: #3b8070;
+}
+
+.button--grey {
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid #35495e;
+  color: #35495e;
+  text-decoration: none;
+  padding: 10px 30px;
+  margin-left: 15px;
+}
+.button--grey:hover {
+  color: #fff;
+  background-color: #35495e;
+}
+.header-con{
+  background:#409eff;
+}
+.header-title{
+  line-height:60px;
+  color:white;
+  font-weight: normal;
+  font-size:18px;
+}
+.menu-patch{
+  height:calc(100% - 280px);
+  border-right: solid 1px #e6e6e6;
 }
 </style>

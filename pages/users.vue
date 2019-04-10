@@ -2,7 +2,45 @@
   <div style="height:100%;">
     <!-- 框架英文：https://nuxtjs.org/guide/installation
     框架中文：https://nuxtjs.org/guide/installation -->
-    <nuxt />
+    <el-container style="height:100%;">
+      <el-header class="header-con">
+        <h1 class="header-title">xxx后台</h1>
+      </el-header>
+      <el-container style="height:100%;">
+        <el-aside width="200px">
+          <el-menu
+              router
+              :default-active="navselected"
+              @select="selectItems"
+              class="el-menu-vertical-demo">
+              <el-menu-item index="/users">
+                <span slot="title">全局配置</span>
+              </el-menu-item>
+              <el-menu-item index="/users/ditch">
+                <span slot="title">渠道列表</span>
+              </el-menu-item>
+              <el-menu-item index="/users/topUpType">
+                <span slot="title">充值类型列表</span>
+              </el-menu-item>
+              <el-menu-item index="/users/topUpMoney">
+                <span slot="title">充值金额列表</span>
+              </el-menu-item>
+              <el-menu-item index="/users/topUpMethod">
+                <span slot="title">支付方式列表</span>
+              </el-menu-item>
+              <!-- <el-submenu index="2">
+                <template slot="title">渠道管理</template>
+                <el-menu-item index="2-1">渠道列表</el-menu-item>
+                <el-menu-item index="2-1">充值类型列表</el-menu-item>
+              </el-submenu> -->
+            </el-menu>
+            <div class="menu-patch"></div>
+        </el-aside>
+        <el-main>
+          <NuxtChild :key="key"/>
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
@@ -10,7 +48,7 @@
 import Logo from '~/components/Logo.vue'
 
 export default {
-  middleware: 'authenticated',
+  // middleware: 'authenticated',
   components: {
     Logo
   },
@@ -29,6 +67,7 @@ export default {
         this.navselected = this.$store.state.page
     },
     selectItems(path){
+      console.log(path)
       this.$store.commit('changePage',path);
       //按钮选中之后设置当前的index为store里的值。
       this.$router.push({

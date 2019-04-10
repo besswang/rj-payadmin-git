@@ -2,6 +2,12 @@ import pkg from './package'
 
 export default {
   mode: 'universal',
+  generate : {
+    subFolders: false
+  },
+  // router: {
+  //   base: '../'
+  // },
 
   /*
   ** Headers of the page

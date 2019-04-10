@@ -6,6 +6,9 @@
           <el-input v-model="name" placeholder="请输入渠道名称" clearable></el-input>
         </el-form-item>
         <el-form-item>
+          <el-input v-model="channelId" placeholder="请输入渠道ID" clearable></el-input>
+        </el-form-item>
+        <el-form-item>
           <el-select v-model="status" placeholder="状态" clearable>
             <el-option label="启用" :value="true"></el-option>
             <el-option label="禁用" :value="false"></el-option>
@@ -15,7 +18,7 @@
           <el-button type="primary" @click="search">搜索</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" class="mb15" @click="add">添加渠道</el-button>
+          <el-button type="primary" class="mb15" @click="add">添加</el-button>
         </el-form-item>
       </el-form>
       <el-table
@@ -43,7 +46,12 @@
         </el-table-column>
         <el-table-column
           prop="name"
-          label="渠道"
+          label="名称"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="channelId"
+          label="渠道ID"
           width="180">
         </el-table-column>
         <el-table-column
@@ -59,6 +67,10 @@
               size="mini"
               type="primary"
               @click="edit(scope.$index, scope.row)">编辑</el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -72,12 +84,15 @@
         :total="total">
       </el-pagination>
       <!-- 添加弹窗-start -->
-      <el-dialog title="添加渠道" :visible.sync="dialogVisible" style="max-width:50rem;margin:0 auto" :show-close="false">
-        <el-form>
-          <el-form-item label="渠道名称">
+      <el-dialog :title="title" :visible.sync="dialogVisible" style="max-width:50rem;margin:0 auto" :show-close="false">
+        <el-form label-width="80px">
+          <el-form-item label="名称">
             <el-input v-model="addName" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item v-if="showEdit">
+          <el-form-item label="渠道ID" v-if="!showEdit">
+            <el-input v-model="addChannelId" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item>
             <el-switch
               style="display: block"
               v-model="editStatus"
@@ -103,11 +118,15 @@ import { mapMutations, mapState } from 'vuex'
 import Logo from '~/components/Logo.vue'
 
 export default {
+  name: 'users-topUpType',
   components: {
     Logo
   },
   data () {
     return {
+      channelId: null,
+      title: '', // 添加类型/修改类型
+      addChannelId: null,
       id: null,
       showEdit: false,
       editStatus: false,
@@ -132,8 +151,7 @@ export default {
     }
   },
   created () {
-    // this.$store.state.page="/ditch"; //设置左侧导航active
-    this.$store.commit('changePage','/ditch')
+    this.$store.commit('changePage','/users/topUpType')
   },
   computed: {
     ...mapState('ditch',['list', 'dialogVisible','loading','btnLoading'])
@@ -153,17 +171,20 @@ export default {
       this.mapLoading()
       let trans = {
         name: this.name,
+        channelId: this.channelId,
         status: this.status,
         pageSize: this.pageSize,
         pageNum: this.currentPage
       }
-      this.$axios.post(this.jk.queryList,trans)
+      this.$axios.post(this.jk.toUpTypeList,trans)
         .then(res => {
           if(res.success){
             const l = res.data
             this.mapList(l)
             this.total = l.total
-            this.mapLoading()
+            setTimeout(() => {
+              this.mapLoading()
+            }, 500)
           }
         })
         .catch(e => {
@@ -174,6 +195,7 @@ export default {
       this.showEdit = false
       this.addName = ''
       this.mapVisible()
+      this.title = '添加类型'
     },
     edit(index, row) {
       this.showEdit = true
@@ -181,14 +203,21 @@ export default {
       this.addName = row.name
       this.editStatus = row.status
       this.mapVisible()
+      this.title = '修改类型'
     },
     save () {
       if(this.addName !== ''){
         this.mapBtnLoading()
+        let trans = {
+          name: this.addName,
+          status: this.editStatus
+        }
         if (this.showEdit) {//编辑
-          this.editBtn()
+          let edit = Object.assign({},trans,{id:this.id})
+          this.editBtn(edit)
         } else { // 添加
-          this.addBtn()
+          let add = Object.assign({},trans,{channelId:Number(this.addChannelId)})
+          this.addBtn(add)
         }
       } else {
         this.$message({
@@ -197,13 +226,31 @@ export default {
         })
       }
     },
-    editBtn () {
-      let trans = {
-        id: this.id,
-        name: this.addName,
-        status: this.editStatus
-      }
-      this.$axios.post(this.jk.ditchEdit,trans)
+    del (val) {
+      this.$confirm('确认删除？')
+        .then(_ => {
+          this.$axios.post(this.jk.toUpTypeDel,{id: val})
+            .then(res => {
+              if(res.success){
+                this.$message({
+                  message: '删除成功',
+                  type: 'success'
+                })
+                this.listFn()
+              }else{
+                this.$message.error(res.msg)
+              }
+            })
+            .catch(e => {
+              console.log(e)
+            })
+        })
+        .catch(_ => {
+          this.$message('取消删除')
+        })
+    },
+    editBtn (obj) {
+      this.$axios.post(this.jk.toUpTypeEdit,obj)
       .then(res => {
         if(res.success){
           this.$message({
@@ -222,8 +269,8 @@ export default {
         console.log(e)
       })
     },
-    addBtn () {
-      this.$axios.post(this.jk.ditchAdd, {name: this.addName})
+    addBtn (obj) {
+      this.$axios.post(this.jk.toUpTypeAdd, obj)
         .then(res => {
           if(res.success){
             this.$message({

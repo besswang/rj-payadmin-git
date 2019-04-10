@@ -3,7 +3,19 @@
     <div>
       <el-form :inline="true">
         <el-form-item>
-          <el-button type="primary" class="mb15" @click="add">添加</el-button>
+          <el-input v-model="name" placeholder="请输入渠道名称" clearable></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="status" placeholder="状态" clearable>
+            <el-option label="启用" :value="true"></el-option>
+            <el-option label="禁用" :value="false"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="search">搜索</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="mb15" @click="add">添加渠道</el-button>
         </el-form-item>
       </el-form>
       <el-table
@@ -30,8 +42,8 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="money"
-          label="金额"
+          prop="name"
+          label="渠道"
           width="180">
         </el-table-column>
         <el-table-column
@@ -46,21 +58,26 @@
             <el-button
               size="mini"
               type="primary"
-              @click="edit(scope.row)">编辑</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="del(scope.row.id)">删除</el-button>
+              @click="edit(scope.$index, scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
       <!-- 添加弹窗-start -->
-      <el-dialog :title="title" :visible.sync="dialogVisible" style="max-width:50rem;margin:0 auto" :show-close="false">
-        <el-form label-width="80px">
-          <el-form-item label="金额">
-            <el-input v-model="addName" autocomplete="off" type="number"></el-input>
+      <el-dialog title="添加渠道" :visible.sync="dialogVisible" style="max-width:50rem;margin:0 auto" :show-close="false">
+        <el-form>
+          <el-form-item label="渠道名称">
+            <el-input v-model="addName" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item v-if="showEdit">
             <el-switch
               style="display: block"
               v-model="editStatus"
@@ -86,16 +103,21 @@ import { mapMutations, mapState } from 'vuex'
 import Logo from '~/components/Logo.vue'
 
 export default {
+  name: 'users-ditch',
   components: {
     Logo
   },
   data () {
     return {
-      title: '', // 添加类型/修改类型
       id: null,
       showEdit: false,
       editStatus: false,
-      addName: ''
+      addName: '',
+      name: '',
+      status: null,
+      currentPage: 1,
+      total: 0,
+      pageSize: 10
       // list: [
       //   {
       //     id: 1,
@@ -110,6 +132,9 @@ export default {
       // ]
     }
   },
+  created () {
+    this.$store.commit('changePage','/users/ditch')
+  },
   computed: {
     ...mapState('ditch',['list', 'dialogVisible','loading','btnLoading'])
   },
@@ -118,7 +143,7 @@ export default {
   },
   methods: {
     ...mapMutations('ditch',{
-      mapList: 'toList',
+      mapList: 'list',
       mapVisible: 'changeVisible',
       mapLoading: 'changeLoading',
       mapBtnLoading: 'changeBtnLoading',
@@ -126,11 +151,18 @@ export default {
     }),
     listFn () {
       this.mapLoading()
-      this.$axios.post(this.jk.toUpMoneyList)
+      let trans = {
+        name: this.name,
+        status: this.status,
+        pageSize: this.pageSize,
+        pageNum: this.currentPage
+      }
+      this.$axios.post(this.jk.queryList,trans)
         .then(res => {
           if(res.success){
             const l = res.data
             this.mapList(l)
+            this.total = l.total
             this.mapLoading()
           }
         })
@@ -139,33 +171,24 @@ export default {
         })
     },
     add () {
-      this.editStatus = false
       this.showEdit = false
       this.addName = ''
       this.mapVisible()
-      this.title = '添加金额'
     },
-    edit(row) {
-      console.log(row)
+    edit(index, row) {
       this.showEdit = true
       this.id = row.id
-      this.addName = row.money
+      this.addName = row.name
       this.editStatus = row.status
       this.mapVisible()
-      this.title = '修改金额'
     },
     save () {
       if(this.addName !== ''){
         this.mapBtnLoading()
-        let trans = {
-          money: this.addName,
-          status: this.editStatus
-        }
         if (this.showEdit) {//编辑
-          let edit = Object.assign({},trans,{id:this.id})
-          this.editBtn(edit)
+          this.editBtn()
         } else { // 添加
-          this.addBtn(trans)
+          this.addBtn()
         }
       } else {
         this.$message({
@@ -174,31 +197,13 @@ export default {
         })
       }
     },
-    del (val) {
-      this.$confirm('确认删除？')
-        .then(_ => {
-          this.$axios.post(this.jk.toUpMoneyDel,{id: val})
-            .then(res => {
-              if(res.success){
-                this.$message({
-                  message: '删除成功',
-                  type: 'success'
-                })
-                this.listFn()
-              }else{
-                this.$message.error(res.msg)
-              }
-            })
-            .catch(e => {
-              console.log(e)
-            })
-        })
-        .catch(_ => {
-          this.$message('取消删除')
-        })
-    },
-    editBtn (obj) {
-      this.$axios.post(this.jk.toUpMoneyEdit,obj)
+    editBtn () {
+      let trans = {
+        id: this.id,
+        name: this.addName,
+        status: this.editStatus
+      }
+      this.$axios.post(this.jk.ditchEdit,trans)
       .then(res => {
         if(res.success){
           this.$message({
@@ -217,8 +222,8 @@ export default {
         console.log(e)
       })
     },
-    addBtn (obj) {
-      this.$axios.post(this.jk.toUpMoneyAdd, obj)
+    addBtn () {
+      this.$axios.post(this.jk.ditchAdd, {name: this.addName})
         .then(res => {
           if(res.success){
             this.$message({
@@ -236,6 +241,19 @@ export default {
         .catch(e => {
           console.log(e)
         })
+    },
+    search () {
+      this.listFn()
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.listFn()
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.listFn()
+      console.log(`当前页: ${val}`);
     }
   }
 }

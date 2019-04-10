@@ -91,6 +91,7 @@ import { mapMutations, mapState } from 'vuex'
 import Logo from '~/components/Logo.vue'
 
 export default {
+  name: 'users-topUpMethod',
   components: {
     Logo
   },
@@ -114,6 +115,9 @@ export default {
       // ]
     }
   },
+  created () {
+    this.$store.commit('changePage','/users/topUpMethod')
+  },
   computed: {
     ...mapState('ditch',['list', 'dialogVisible','loading','btnLoading'])
   },
@@ -135,7 +139,9 @@ export default {
           if(res.success){
             const l = res.data
             this.mapList(l)
-            this.mapLoading()
+            setTimeout(() => {
+              this.mapLoading()
+            }, 500)
           }
         })
         .catch(e => {
