@@ -1,5 +1,7 @@
 import Vue from 'vue'
 export const url = {
+  'login': '/admin/user/login',
+  'changePassword': '/admin/user/update',
   'setting': '/global/config/admin/query/info',
   'settingEdit': '/global/config/admin/update/value',
   // 渠道列表
@@ -18,6 +20,8 @@ export const url = {
   'toUpMoneyDel': '/money/quota/admin/delete',
   // 支付方式管理
   'toUpMethodList': '/third/pay/admin/query',
-  'toUpMethodEdit': '/third/pay/admin/update'
+  'toUpMethodEdit': '/third/pay/admin/update',
+  // 订单管理
+  'orderList': '/order/admin/order/page'
 }
 Vue.prototype.jk = url

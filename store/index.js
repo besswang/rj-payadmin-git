@@ -1,13 +1,20 @@
 export const state = () => ({
   page: '/users',
-  user: ''
+  userId: ''
 })
 
 export const mutations = {
   changePage (state, data) {
     state.page = data
   },
-  saveUser (state, data) {
-    state.user = data
+  saveUserId (state, data) {
+    state.userId = data
   }
 }
+// export const actions = {
+//   nuxtServerInit ({ commit }, { req }) {
+//     if (req.session && req.session.userId) {
+//       commit('saveUserId', req.session.userId)
+//     }
+//   }
+// }

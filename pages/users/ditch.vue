@@ -100,13 +100,8 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import Logo from '~/components/Logo.vue'
-
 export default {
   name: 'users-ditch',
-  components: {
-    Logo
-  },
   data () {
     return {
       id: null,

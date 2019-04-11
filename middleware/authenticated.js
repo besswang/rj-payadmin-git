@@ -3,7 +3,7 @@ export default function ({
   store,
   redirect
 }) {
-  if (!store.state.user) {
+  if (!store.state.userId) {
     return redirect('/login')
   }
 }

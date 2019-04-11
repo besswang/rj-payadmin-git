@@ -26,3 +26,31 @@ export const bel = Vue.filter('bel',((val, type) => {
   type = val ? '启用' : '禁用'
   return type
 }))
+export const orderType = Vue.filter('orderType', ((val, type) => {
+  switch(val){
+    case 'SUCCES':
+      type = '成功';
+      break;
+    case 'FALSE':
+      type = '失败';
+      break;
+    case 'PENDING_PAYMENT':
+      type = '线下扫码';
+      break;
+  }
+  return type
+}))
+export const orderPayType = Vue.filter('orderPayType', ((val, type) => {
+  switch (val) {
+    case 'WX':
+      type = '微信';
+      break;
+    case 'AILI_PAY':
+      type = '支付宝';
+      break;
+    case 'LINE_SCAN_CODE':
+      type = '线下扫码';
+      break;
+  }
+  return type
+}))
