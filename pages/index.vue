@@ -7,6 +7,7 @@
 <script>
 export default {
   created () {
+    console.log(this.$router)
     this.$router.push('/login') // 页面加载时跳转
   }
 }

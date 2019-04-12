@@ -3,11 +3,14 @@ import pkg from './package'
 export default {
   mode: 'universal',
   generate : {
-    subFolders: false
+    subFolders: false,
+    routes: [
+      '/','/login','/users','/users/ditch','/users/topUpMethod','/users/topUpMoney','/users/topUpType'
+    ]
   },
   router: {
-    base: '/admin/'
-    // mode: 'hash'
+    base: '/admin/',
+    mode: 'hash'
   },
 
   /*
@@ -50,7 +53,7 @@ export default {
   ],
   axios: {
       proxy: true, // 表示开启代理
-      //prefix: '', // 表示给请求url加个前缀 /api
+      prefix: '/api', // 表示给请求url加个前缀 /api
       credentials: true // 表示跨域请求时是否需要使用凭证
   },
   proxy: {
