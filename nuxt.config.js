@@ -4,14 +4,14 @@ export default {
   mode: 'universal',
   generate : {
     subFolders: false,
-    routes: [
-      '/','/login','/users','/users/ditch','/users/topUpMethod','/users/topUpMoney','/users/topUpType'
-    ]
+    // routes: [
+    //   '/','/login','/users','/users/ditch','/users/topUpMethod','/users/topUpMoney','/users/topUpType'
+    // ]
   },
-  router: {
-    base: '/admin/',
-    mode: 'hash'
-  },
+  // router: {
+  //   base: '/admin/',
+  //   mode: 'hash'
+  // },
 
   /*
   ** Headers of the page
