@@ -3,15 +3,12 @@ import pkg from './package'
 export default {
   mode: 'universal',
   generate : {
-    subFolders: false,
-    // routes: [
-    //   '/','/login','/users','/users/ditch','/users/topUpMethod','/users/topUpMoney','/users/topUpType'
-    // ]
+    subFolders: false
   },
-  router: {
-    base: '/admin/',
-    mode: 'hash'
-  },
+  // router: {
+  //   base: '/admin/',
+  //   mode: 'hash'
+  // },
 
   /*
   ** Headers of the page
