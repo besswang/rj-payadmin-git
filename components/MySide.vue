@@ -61,6 +61,6 @@ export default {
 .side-con
   height 100%
   .menu-patch
-    height calc(100% - 280px)
+    height calc(100% - 336px)
     border-right solid 1px #e6e6e6
 </style>
